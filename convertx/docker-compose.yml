@@ -1,0 +1,23 @@
+services:
+  convertx:
+    image: ghcr.io/c4illin/convertx:v0.18.0
+    container_name: convertx
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - ACCOUNT_REGISTRATION=false
+      - ALLOW_UNAUTHENTICATED=false
+      - HTTP_ALLOWED=true
+      - AUTO_DELETE_EVERY_N_HOURS=12
+      - MAX_CONVERT_PROCESS=4
+      - LANGUAGE=pt-PT
+    volumes:
+      - ./data:/app/data
+    networks:
+      - homelab
+    cpus: 4.0
+    mem_limit: 3g
+
+networks:
+  homelab:
+    external: true

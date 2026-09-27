@@ -1,0 +1,65 @@
+services:
+  postgres:
+    # Par travado com a versão do FerretDB abaixo — não atualizes uma sem a outra.
+    image: ghcr.io/ferretdb/postgres-documentdb:17-0.107.0-ferretdb-2.7.0
+    container_name: komodo-postgres
+    labels:
+      komodo.skip: # impede que o Komodo pare a própria BD num StopAllContainers
+    restart: unless-stopped
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: ${KOMODO_DATABASE_USERNAME}
+      POSTGRES_PASSWORD: ${KOMODO_DATABASE_PASSWORD}
+      POSTGRES_DB: postgres
+    networks:
+      - komodo-internal
+
+  ferretdb:
+    image: ghcr.io/ferretdb/ferretdb:2.7.0
+    container_name: komodo-ferretdb
+    labels:
+      komodo.skip:
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    volumes:
+      - ferretdb-state:/state
+    environment:
+      FERRETDB_POSTGRESQL_URL: postgres://${KOMODO_DATABASE_USERNAME}:${KOMODO_DATABASE_PASSWORD}@postgres:5432/postgres
+    networks:
+      - komodo-internal
+
+  core:
+    image: ghcr.io/moghtech/komodo-core:2.3.3
+    container_name: komodo-core
+    labels:
+      komodo.skip:
+    init: true
+    restart: unless-stopped
+    depends_on:
+      - ferretdb
+    env_file: .env
+    environment:
+      KOMODO_DATABASE_ADDRESS: ferretdb:27017
+    volumes:
+      - ./data/keys:/config/keys
+      - ./data/backups:/backups
+    extra_hosts:
+      # Sem isto o container pode não resolver o nome MagicDNS,
+      # e a validação do certificado por nome falha.
+      - "${TS_HOST}:${TS_IP}"
+    networks:
+      - komodo-internal
+      - homelab
+    ports:
+      - "127.0.0.1:9120:9120"
+
+volumes:
+  postgres-data:
+  ferretdb-state:
+
+networks:
+  komodo-internal:
+  homelab:
+    external: true

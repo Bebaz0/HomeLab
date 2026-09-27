@@ -1,0 +1,38 @@
+poll_interval_seconds: 300
+review_drafts: false
+
+# Names are case-sensitive against the API and the owner is Bebaz0, not bebaz:
+# `bebaz/homelab` 404s.
+repos:
+  - name: Bebaz0/HomeLab
+    # label: review-me   # optional gate: only review PRs carrying this label
+  # - name: Bebaz0/HabitWar   # TypeScript, ~17 open PRs: expect a burst on first poll
+  # - name: Bebaz0/SouFar     # Swift
+
+analyzers:
+  syntax: true     # parses yaml/xml/json outright; catches what no linter reports
+  ruff: true
+  bandit: true
+  semgrep: true    # the only one that covers JS/TS/Go; fetches its ruleset on first run
+
+# A list is allowed; each entry becomes another --config. p/default already covers
+# yaml, html, swift, js/ts and go; p/swift adds the iOS-specific rules.
+semgrep_config:
+  - p/default
+  - p/swift
+
+max_file_kb: 256
+max_changed_files: 100
+
+ignore_globs:
+  - "**/*.lock"
+  - "**/package-lock.json"
+  - "**/poetry.lock"
+  - "**/uv.lock"
+  - "**/node_modules/**"
+  - "**/vendor/**"
+  - "**/migrations/**"
+  - "**/*.min.js"
+  - "**/*.generated.*"
+  - "**/dist/**"
+  - "**/build/**"

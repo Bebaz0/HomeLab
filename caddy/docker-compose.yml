@@ -1,0 +1,33 @@
+services:
+  caddy:
+    image: caddy:alpine
+    container_name: caddy
+    labels:
+      - wud.watch.digest=true
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - "80:80"
+      - "8443:8443"
+      - "8444:8444"
+      - "8445:8445"
+      - "8446:8446"
+      - "8447:8447"
+      - "8448:8448"
+      - "8449:8449"
+      - "8450:8450"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddydata:/data
+      - caddyconfig:/config
+      - /etc/caddy/certs:/etc/caddy/certs:ro
+    networks:
+      - homelab
+
+volumes:
+  caddydata:
+  caddyconfig:
+
+networks:
+  homelab:
+    external: true

@@ -1,0 +1,48 @@
+services:
+  romm:
+    image: rommapp/romm:5.2.0
+    container_name: romm
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DB_HOST: romm-db
+      DB_NAME: romm
+      DB_USER: romm
+      ROMM_BASE_URL: https://${TS_HOST}:8448
+    volumes:
+      - ./library:/romm/library
+      - ./assets:/romm/assets
+      - ./config:/romm/config
+      - romm_resources:/romm/resources
+      - romm_redis_data:/redis-data
+    depends_on:
+      romm-db:
+        condition: service_healthy
+    networks: [homelab]
+
+  romm-db:
+    image: mariadb:12.3
+    container_name: romm-db
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      MARIADB_DATABASE: romm
+      MARIADB_USER: romm
+      MARIADB_AUTO_UPGRADE: "1"
+    volumes:
+      - romm_db:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks: [homelab]
+
+volumes:
+  romm_resources:
+  romm_redis_data:
+  romm_db:
+
+networks:
+  homelab:
+    external: true

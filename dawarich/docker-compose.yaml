@@ -1,0 +1,144 @@
+networks:
+  dawarich:
+  homelab:
+    external: true
+
+services:
+  dawarich_redis:
+    image: redis:8.8-alpine
+    container_name: dawarich_redis
+    command: redis-server --save 900 1 --save 300 10 --appendonly no
+    networks: [dawarich]
+    volumes:
+      - dawarich_shared:/data
+    restart: always
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
+
+  dawarich_db:
+    image: postgis/postgis:18-3.6-alpine
+    container_name: dawarich_db
+    shm_size: 1G
+    networks: [dawarich]
+    volumes:
+      - dawarich_db_data_18:/var/lib/postgresql
+      - dawarich_shared:/var/shared
+    environment:
+      POSTGRES_USER: dawarich
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: dawarich_production
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dawarich -d dawarich_production"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
+
+  dawarich_app:
+    image: freikin/dawarich:1.14.5
+    container_name: dawarich_app
+    networks: [dawarich, homelab]
+    volumes:
+      - dawarich_public:/var/app/public
+      - dawarich_watched:/var/app/tmp/imports/watched
+      - dawarich_storage:/var/app/storage
+    stdin_open: true
+    tty: true
+    entrypoint: web-entrypoint.sh
+    command: ['bin/rails', 'server', '-p', '3000', '-b', '::']
+    restart: on-failure
+    environment:
+      RAILS_ENV: production
+      SELF_HOSTED: "true"
+      REDIS_URL: redis://dawarich_redis:6379
+      DATABASE_HOST: dawarich_db
+      DATABASE_PORT: 5432
+      DATABASE_USERNAME: dawarich
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD}
+      DATABASE_NAME: dawarich_production
+      APPLICATION_HOSTS: "${TS_HOST},localhost,127.0.0.1,::1"
+      APPLICATION_PROTOCOL: https
+      TIME_ZONE: Europe/Lisbon
+      DISTANCE_UNIT: km
+      STORE_GEODATA: "true"
+      SECRET_KEY_BASE: ${SECRET_KEY_BASE}
+      RAILS_LOG_TO_STDOUT: "true"
+      PHOTON_API_HOST: photon.komoot.io
+      PHOTON_API_USE_HTTPS: true
+    logging:
+      driver: "json-file"
+      options:
+        max-size: 50m
+        max-file: 3
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO - --header='X-Forwarded-Proto: https' http://127.0.0.1:3000/api/v1/health | grep -q '\"status\"\\s*:\\s*\"ok\"'"]
+      interval: 10s
+      retries: 30
+      start_period: 60s
+      timeout: 10s
+    depends_on:
+      dawarich_db: { condition: service_healthy, restart: true }
+      dawarich_redis: { condition: service_healthy, restart: true }
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 4G
+
+  dawarich_sidekiq:
+    image: freikin/dawarich:1.14.5
+    container_name: dawarich_sidekiq
+    networks: [dawarich]
+    volumes:
+      - dawarich_public:/var/app/public
+      - dawarich_watched:/var/app/tmp/imports/watched
+      - dawarich_storage:/var/app/storage
+    stdin_open: true
+    tty: true
+    entrypoint: sidekiq-entrypoint.sh
+    command: ['sidekiq']
+    restart: on-failure
+    environment:
+      RAILS_ENV: production
+      SELF_HOSTED: "true"
+      REDIS_URL: redis://dawarich_redis:6379
+      DATABASE_HOST: dawarich_db
+      DATABASE_PORT: 5432
+      DATABASE_USERNAME: dawarich
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD}
+      DATABASE_NAME: dawarich_production
+      APPLICATION_HOSTS: "${TS_HOST},localhost,127.0.0.1,::1"
+      APPLICATION_PROTOCOL: https
+      BACKGROUND_PROCESSING_CONCURRENCY: 5
+      SECRET_KEY_BASE: ${SECRET_KEY_BASE}
+      RAILS_LOG_TO_STDOUT: "true"
+      PHOTON_API_HOST: photon.komoot.io
+      PHOTON_API_USE_HTTPS: true
+    logging:
+      driver: "json-file"
+      options:
+        max-size: 50m
+        max-file: 3
+    healthcheck:
+      test: ["CMD-SHELL", "pgrep -f sidekiq"]
+      interval: 10s
+      retries: 30
+      start_period: 60s
+      timeout: 10s
+    depends_on:
+      dawarich_db: { condition: service_healthy, restart: true }
+      dawarich_redis: { condition: service_healthy, restart: true }
+      dawarich_app: { condition: service_healthy, restart: true }
+
+volumes:
+  dawarich_db_data:
+  dawarich_db_data_18:
+  dawarich_shared:
+  dawarich_public:
+  dawarich_watched:
+  dawarich_storage:

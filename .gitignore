@@ -1,0 +1,36 @@
+# ---- secrets: only *.example templates are committed ----
+.env
+*.env
+.env.*
+!.env.example
+!*.env.example
+*.pem
+*.key
+*.crt
+
+# ---- runtime data / state ----
+data/
+*.db
+*.db-*
+*.sqlite
+*.sqlite*
+*.log
+adguard/conf/
+adguard/work/
+home-assistant/config/
+homepage/config/logs/
+komodo/data
+romm/library
+romm/assets
+sparkyfitness/postgresql/
+wud/store/
+
+# ---- editor / tooling junk ----
+*.bak
+*.swp
+*.swo
+*~
+homepage/backup-*/
+insta-bot/.venv/
+__pycache__/
+.pytest_cache/

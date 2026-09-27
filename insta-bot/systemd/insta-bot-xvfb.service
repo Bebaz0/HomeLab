@@ -1,0 +1,6 @@
+[Unit]
+Description=Virtual display :99 for insta-bot
+PartOf=insta-bot.service
+
+[Service]
+ExecStart=/usr/bin/Xvfb :99 -screen 0 1366x768x24 -nolisten tcp

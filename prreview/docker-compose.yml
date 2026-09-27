@@ -1,0 +1,30 @@
+services:
+  prreview:
+    build: .
+    image: homelab/prreview:local
+    container_name: prreview
+    restart: unless-stopped
+    user: "1000:1000"
+    env_file: .env
+    volumes:
+      - ./data:/data
+      - ./config:/config:ro
+    networks:
+      - homelab
+
+  prreview-web:
+    image: caddy:2.11-alpine
+    container_name: prreview-web
+    restart: unless-stopped
+    volumes:
+      - ./data/out:/srv:ro
+      - ./web/Caddyfile:/etc/caddy/Caddyfile:ro
+    networks:
+      - homelab
+    labels:
+      - "wud.watch=true"
+      - "wud.tag.include=^\\d+\\.\\d+-alpine$$"
+
+networks:
+  homelab:
+    external: true

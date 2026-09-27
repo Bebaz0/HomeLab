@@ -1,0 +1,20 @@
+services:
+  wud:
+    image: getwud/wud:9.0.2
+    container_name: wud
+    # ponytail: NOT named .env on purpose. Compose auto-loads ./.env for variable
+    # substitution, which eats the $ signs in the apr1 password hash.
+    env_file: wud.env
+    environment:
+      - WUD_WATCHER_LOCAL_CRON=0 7 * * *
+      - WUD_LOG_LEVEL=warn
+      - WUD_LOG_FORMAT=text
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./store:/store
+    networks: [homelab]
+    restart: unless-stopped
+
+networks:
+  homelab:
+    external: true

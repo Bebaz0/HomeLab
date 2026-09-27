@@ -1,0 +1,23 @@
+services:
+  homepage:
+    image: ghcr.io/gethomepage/homepage:latest
+    container_name: homepage
+    labels:
+      - wud.watch.digest=true
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      HOMEPAGE_ALLOWED_HOSTS: dash.homelab
+    volumes:
+      - ./config:/app/config
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      # ponytail: Next scans public/ once at boot, so config/images is never served.
+      # Mount it into public/ directly. Restart the container after adding an image.
+      - ./config/images:/app/public/images:ro
+    networks:
+      - homelab
+
+networks:
+  homelab:
+    external: true

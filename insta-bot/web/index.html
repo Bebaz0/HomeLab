@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="pt-PT">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Insta-bot · Painel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 2l12 14-12 14L4 16z' fill='%23c8aa6e'/%3E%3Cpath d='M16 9l6 7-6 7-6-7z' fill='%230ac8b9'/%3E%3C/svg%3E">
+</head>
+<body>
+<div class="bg"></div>
+
+<header class="top">
+  <div class="brand">
+    <span class="gem" aria-hidden="true"></span>
+    <div>
+      <h1>Insta-bot</h1>
+      <p class="sub">Convocatória automática para o Summoner’s Rift</p>
+    </div>
+  </div>
+  <div class="clock" id="clock">--:--</div>
+</header>
+
+<main class="grid">
+
+  <!-- Estado -->
+  <section class="panel hero" aria-labelledby="h-status">
+    <h2 id="h-status">Estado</h2>
+    <div class="hero-body">
+      <div class="status-block">
+        <span class="badge big" id="status-badge">A carregar…</span>
+        <p class="status-line" id="status-line"></p>
+        <p class="status-line muted" id="window-line"></p>
+      </div>
+      <button class="play" id="power" type="button" disabled>
+        <span id="power-label">…</span>
+      </button>
+    </div>
+
+    <div class="alert" id="stopped" hidden>
+      <div>
+        <strong>Bot parado por segurança</strong>
+        <p id="stopped-reason"></p>
+        <p class="muted">Resolve o login com <code>./phase0.sh</code> pelo VNC e depois limpa o erro.</p>
+      </div>
+      <button class="btn ghost" id="clear-stopped" type="button">Limpar erro</button>
+    </div>
+
+    <div class="row-controls">
+      <label class="switch">
+        <input type="checkbox" id="dry-run">
+        <span class="track"><span class="thumb"></span></span>
+        <span class="switch-label">Modo treino <small>(dry-run: só regista, não envia)</small></span>
+      </label>
+      <div class="cooldown">
+        <span id="cooldown-text">Sem cooldown</span>
+        <button class="btn ghost small" id="reset-cooldown" type="button">Reset cooldown</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="stack">
+  <!-- Horário -->
+  <section class="panel" aria-labelledby="h-hours" data-card="hours">
+    <h2 id="h-hours">Horário</h2>
+    <div class="fields">
+      <label class="field">
+        <span>Início</span>
+        <input type="text" id="start" inputmode="numeric" pattern="([01][0-9]|2[0-3]):[0-5][0-9]" placeholder="HH:MM" maxlength="5" required>
+      </label>
+      <label class="field">
+        <span>Fim</span>
+        <input type="text" id="end" inputmode="numeric" pattern="([01][0-9]|2[0-3]):[0-5][0-9]" placeholder="HH:MM" maxlength="5" required>
+      </label>
+      <label class="field">
+        <span>Cooldown (min)</span>
+        <input type="number" id="cooldown" min="0" max="1440" required>
+      </label>
+    </div>
+    <p class="hint">Se o fim for antes do início, a janela passa a meia-noite (ex.: 17:00 → 00:05). O bot sai até 10 min depois do fim.</p>
+    <div class="card-actions">
+      <span class="dirty" hidden>Alterações por guardar</span>
+      <button class="btn gold" type="button" data-save="hours">Guardar</button>
+    </div>
+  </section>
+
+  <!-- Respostas recentes -->
+  <section class="panel" aria-labelledby="h-recent">
+    <h2 id="h-recent">Respostas recentes</h2>
+    <ul class="feed" id="recent"></ul>
+  </section>
+
+  </div>
+
+  <!-- Respostas -->
+  <section class="panel" aria-labelledby="h-replies" data-card="replies">
+    <h2 id="h-replies">Respostas</h2>
+    <p class="hint">O bot escolhe uma ao acaso, nunca a mesma duas vezes seguidas.</p>
+    <ul class="edit-list" data-list="replies"></ul>
+    <form class="add-row" data-add="replies">
+      <input type="text" maxlength="100" placeholder="Nova resposta…" aria-label="Nova resposta">
+      <button class="btn ghost" type="submit">Adicionar</button>
+    </form>
+    <div class="card-actions">
+      <span class="dirty" hidden>Alterações por guardar</span>
+      <button class="btn gold" type="button" data-save="replies">Guardar</button>
+    </div>
+  </section>
+
+  <!-- Gatilhos -->
+  <section class="panel wide" aria-labelledby="h-triggers" data-card="triggers">
+    <h2 id="h-triggers">Gatilhos</h2>
+    <p class="hint">
+      <code>*</code> = quaisquer palavras pelo meio · <code>/</code> = alternativas ·
+      maiúsculas e acentos são ignorados. Ex.: <code>siga/bora * jogar</code>
+    </p>
+    <div class="two-col">
+      <div>
+        <h3>Convites <small>até <input type="number" class="inline-num" id="max-words" min="1" max="100" aria-label="Máximo de palavras"> palavras</small></h3>
+        <ul class="edit-list" data-list="triggers"></ul>
+        <form class="add-row" data-add="triggers">
+          <input type="text" maxlength="100" placeholder="Novo gatilho…" aria-label="Novo gatilho">
+          <button class="btn ghost" type="submit">Adicionar</button>
+        </form>
+      </div>
+      <div>
+        <h3>Só em mensagens curtas <small>até <input type="number" class="inline-num" id="max-words-short" min="1" max="100" aria-label="Máximo de palavras curtas"> palavras</small></h3>
+        <p class="hint">Para palavras ambíguas como “lol”. Mensagens que são só riso (“lol”, “kkkk lol”) nunca contam.</p>
+        <ul class="edit-list" data-list="short_triggers"></ul>
+        <form class="add-row" data-add="short_triggers">
+          <input type="text" maxlength="100" placeholder="Novo gatilho curto…" aria-label="Novo gatilho curto">
+          <button class="btn ghost" type="submit">Adicionar</button>
+        </form>
+      </div>
+    </div>
+    <div class="card-actions">
+      <span class="dirty" hidden>Alterações por guardar</span>
+      <button class="btn gold" type="button" data-save="triggers">Guardar</button>
+    </div>
+  </section>
+
+  <!-- Histórico -->
+  <section class="panel wide" aria-labelledby="h-history">
+    <h2 id="h-history">Histórico de mensagens</h2>
+    <div class="table-wrap">
+      <table class="history">
+        <thead><tr><th>Hora</th><th>De</th><th>Mensagem</th><th>Decisão</th></tr></thead>
+        <tbody id="history"></tbody>
+      </table>
+    </div>
+  </section>
+
+</main>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+<script src="app.js"></script>
+</body>
+</html>

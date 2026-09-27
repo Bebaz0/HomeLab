@@ -1,0 +1,19 @@
+services:
+  stirling-pdf:
+    image: docker.stirlingpdf.com/stirlingtools/stirling-pdf:2.14.3-fat
+    container_name: stirling-pdf
+    restart: unless-stopped
+    volumes:
+      - ./data/configs:/configs
+      - ./data/logs:/logs
+      - ./data/pipeline:/pipeline
+      - ./data/tessdata:/usr/share/tessdata
+    environment:
+      - SECURITY_ENABLELOGIN=false
+      - SYSTEM_DEFAULTLOCALE=pt-PT
+    networks:
+      - homelab
+
+networks:
+  homelab:
+    external: true

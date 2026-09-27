@@ -1,0 +1,52 @@
+title: arroz
+description: homelab
+
+background:
+  image: /images/fundo.jpg
+  blur: sm
+  brightness: 45
+  opacity: 55
+
+theme: dark
+color: slate
+headerStyle: boxedWidgets
+cardBlur: md
+iconStyle: theme
+target: _blank
+
+hideVersion: true
+disableCollapse: false
+useEqualHeights: true
+fiveColumns: false
+# stats de CPU/RAM/rede por container: off, só interessam os widgets reais
+showStats: false
+
+# escreve para filtrar serviços, Enter abre o primeiro
+quicklaunch:
+  searchDescriptions: true
+  showSearchSuggestions: true
+  hideInternetSearch: false
+  provider: duckduckgo
+
+# a ordem aqui é a ordem no ecrã. Grupo novo = bloco novo aqui + em services.yaml
+layout:
+  Infraestrutura:
+    style: row
+    columns: 2
+    icon: mdi-server-network
+  Família:
+    style: row
+    columns: 3
+    icon: mdi-home-heart
+  Produtividade:
+    style: row
+    columns: 3
+    icon: mdi-briefcase-outline
+  Serviços:
+    style: row
+    columns: 2
+    icon: mdi-apps
+  Entretenimento:
+    style: row
+    columns: 2
+    icon: mdi-gamepad-variant-outline

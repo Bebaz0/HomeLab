@@ -1,0 +1,17 @@
+[Unit]
+Description=insta-bot control panel (insta-bot.homelab via Caddy)
+After=network-online.target
+
+[Service]
+Type=exec
+WorkingDirectory=%h/homelab/insta-bot
+Environment=TZ=Europe/Lisbon LANG=pt_PT.UTF-8 PYTHONUNBUFFERED=1
+# WEB_BIND, and DRY_RUN as the default until data/config.json exists (same as the bot).
+EnvironmentFile=%h/homelab/insta-bot/.env
+ExecStart=%h/homelab/insta-bot/.venv/bin/python web.py
+# docker0 (172.17.0.1) may not exist yet right after boot.
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=default.target

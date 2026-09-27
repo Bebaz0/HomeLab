@@ -1,0 +1,45 @@
+services:
+  server:
+    image: yooooomi/your_spotify_server:1.20.0
+    container_name: your_spotify_server
+    restart: unless-stopped
+    depends_on:
+      - mongo
+    env_file: .env
+    environment:
+      API_ENDPOINT: https://${TS_HOST}:8446/api
+      CLIENT_ENDPOINT: https://${TS_HOST}:8446
+      CORS: https://${TS_HOST}:8446
+      MONGO_ENDPOINT: mongodb://mongo:27017/your_spotify
+      TIMEZONE: Europe/Lisbon
+      COOKIE_VALIDITY_MS: 30d
+      LOG_LEVEL: info
+    networks:
+      - homelab
+      - internal
+
+  client:
+    image: yooooomi/your_spotify_client:1.20.0
+    container_name: your_spotify_client
+    restart: unless-stopped
+    depends_on:
+      - server
+    environment:
+      API_ENDPOINT: https://${TS_HOST}:8446/api
+    networks:
+      - homelab
+
+  mongo:
+    image: mongo:7.0.43
+    container_name: your_spotify_mongo
+    restart: unless-stopped
+    command: ["--wiredTigerCacheSizeGB", "0.5"]
+    volumes:
+      - ./data/db:/data/db
+    networks:
+      - internal
+networks:
+  homelab:
+    external: true
+  internal:
+    driver: bridge

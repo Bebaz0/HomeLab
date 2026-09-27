@@ -1,0 +1,19 @@
+- resources:
+    cpu: true
+    memory: true
+    disk: /
+    cputemp: true
+    uptime: true
+    label: arroz
+
+- search:
+    provider: duckduckgo
+    target: _blank
+    focus: true
+
+- datetime:
+    text_size: xl
+    format:
+      dateStyle: medium
+      timeStyle: short
+      hourCycle: h23

@@ -1,0 +1,200 @@
+# Para adicionar um serviço novo, copia este bloco para o grupo certo:
+#
+#   - Nome:
+#       icon: nome.svg          # dashboard-icons, ou mdi-<icone>, ou ficheiro em config/images
+#       href: http://x.homelab  # link do utilizador
+#       description: uma linha
+#       siteMonitor: http://container:porta   # ping interno, marca UP/DOWN
+#       server: local
+#       container: nome-do-container          # estado do docker
+#       widget:                               # opcional
+#         type: ...
+#
+# Segredos: nunca escrever aqui. Pôr em homepage/.env como
+# HOMEPAGE_VAR_ALGO=valor e referenciar com {{HOMEPAGE_VAR_ALGO}}.
+
+- Infraestrutura:
+    - AdGuard Home:
+        icon: adguard-home.svg
+        href: http://adguard.homelab
+        description: DNS e bloqueio
+        siteMonitor: http://adguard:80
+        server: local
+        container: adguard
+        widget:
+          type: adguard
+          url: http://adguard:80
+          username: "{{HOMEPAGE_VAR_ADGUARD_USER}}"
+          password: "{{HOMEPAGE_VAR_ADGUARD_PASS}}"
+
+    - Netdata:
+        icon: netdata.svg
+        href: http://netdata.homelab
+        description: Métricas do host
+        siteMonitor: http://netdata:19999
+        server: local
+        container: netdata
+        widget:
+          type: netdata
+          url: http://netdata:19999
+
+    - WUD:
+        icon: mdi-package-up
+        href: http://wud.homelab
+        description: Updates das imagens
+        siteMonitor: http://wud:3000
+        server: local
+        container: wud
+        widget:
+          type: whatsupdocker
+          url: http://wud:3000
+          username: "{{HOMEPAGE_VAR_WUD_USER}}"
+          password: "{{HOMEPAGE_VAR_WUD_PASS}}"
+
+    - Komodo:
+        icon: komodo.svg
+        href: http://komodo.homelab
+        description: Gestão de stacks e servidores
+        siteMonitor: http://komodo-core:9120
+        server: local
+        container: komodo-core
+     #    widget: precisa de API key/secret gerados em Komodo > Settings > API Keys
+    #     widget:
+   #        type: komodo
+  #         url: http://komodo-core:9120
+ #          key: "{{HOMEPAGE_VAR_KOMODO_KEY}}"
+#           secret: "{{HOMEPAGE_VAR_KOMODO_SECRET}}"
+
+- Família:
+    - KitchenOwl:
+        icon: kitchenowl.svg
+        href: https://{{HOMEPAGE_VAR_TS_HOST}}:8449
+        description: Lista de compras e receitas
+        siteMonitor: http://kitchenowl:8080
+        server: local
+        container: kitchenowl
+        # sem widget: o homepage não tem integração para KitchenOwl
+
+    - Dawarich:
+        icon: dawarich.png
+        href: https://{{HOMEPAGE_VAR_TS_HOST}}:8445
+        description: Histórico de localização
+        server: local
+        container: dawarich_app
+
+    - SparkyFitness:
+        icon: mdi-dumbbell
+        href: https://{{HOMEPAGE_VAR_TS_HOST}}:8443
+        description: Nutrição e treino
+        siteMonitor: http://sparkyfitness-frontend:80
+        server: local
+        container: sparkyfitness-frontend
+        widget:
+          type: sparkyfitness
+          url: http://sparkyfitness-frontend:80
+          key: "{{HOMEPAGE_VAR_SPARKY_KEY}}"
+
+- Produtividade:
+    - ConvertX:
+        icon: convertx.png
+        href: http://convert.homelab
+        description: Conversor de ficheiros
+        siteMonitor: http://convertx:3000
+        server: local
+        container: convertx
+
+    - StirlingPDF:
+        icon: stirling-pdf.png
+        href: http://pdf.homelab
+        description: Manipulação de PDFs
+        siteMonitor: http://stirling-pdf:8080
+        server: local
+        container: stirling-pdf
+
+    - PR Review:
+        icon: mdi-source-pull
+        href: http://prreview.homelab
+        description: Análise estática dos PRs
+        siteMonitor: http://prreview-web:80
+        server: local
+        container: prreview
+
+
+    - Excalidraw:
+        icon: excalidraw.png
+        href: http://excalidraw.homelab
+        description: Quadro branco e diagramas
+        siteMonitor: http://excalidraw:80
+        server: local
+        container: excalidraw
+  
+    - Obsidian Sync:
+        icon: obsidian.png
+        href: https://{{HOMEPAGE_VAR_TS_HOST}}:8450/_utils/
+        description: CouchDB · Self-hosted LiveSync
+        siteMonitor: http://couchdb:5984/_up
+        server: local
+        container: couchdb
+
+- Serviços:
+    - Vaultwarden:
+        icon: vaultwarden.svg
+        href: https://{{HOMEPAGE_VAR_TS_HOST}}:8444
+        description: Gestor de passwords
+        siteMonitor: http://vaultwarden:80
+        server: local
+        container: vaultwarden
+
+    - Your Spotify:
+        icon: your-spotify.png
+        href: https://{{HOMEPAGE_VAR_TS_HOST}}:8446
+        description: Estatísticas de escuta
+        siteMonitor: http://your_spotify_client:3000
+        server: local
+        container: your_spotify_client
+        widget:
+          type: yourspotify
+          url: http://your_spotify_server:8080
+          key: "{{HOMEPAGE_VAR_SPOTIFY_KEY}}"
+          interval: month
+
+- Entretenimento:
+    - RomM:
+        icon: romm.svg
+        href: https://{{HOMEPAGE_VAR_TS_HOST}}:8448
+        description: Biblioteca de jogos retro
+        siteMonitor: http://romm:8080
+        server: local
+        container: romm
+        widget:
+          type: romm
+          url: http://romm:8080
+
+    - Insta-bot:
+        icon: instagram.svg
+        href: http://insta-bot.homelab
+        description: Convocatórias de LoL no Instagram
+        siteMonitor: http://172.17.0.1:8091/api/status
+        # sem container: corre no host como serviço systemd do bebaz
+        widget:
+          type: customapi
+          url: http://172.17.0.1:8091/api/status
+          refreshInterval: 30000
+          mappings:
+            - field: running
+              label: Estado
+              remap:
+                - value: true
+                  to: Em jogo
+                - value: false
+                  to: Fora de jogo
+            - field: dry_run
+              label: Modo
+              remap:
+                - value: true
+                  to: Treino
+                - value: false
+                  to: A sério
+            - field: cooldown_left
+              label: Cooldown
+              format: duration

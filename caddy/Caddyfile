@@ -1,0 +1,123 @@
+{
+    auto_https off
+    # ponytail: h3 advertised on 8443-8446 but docker only publishes TCP -> browsers stall on QUIC. Publish those ports /udp if h3 is ever wanted.
+    servers {
+        protocols h1 h2
+    }
+}
+
+# Tailnet cert from `tailscale cert`, mounted from /etc/caddy/certs. TS_HOST lives in .env.
+(ts) {
+	tls /etc/caddy/certs/{$TS_HOST}.crt /etc/caddy/certs/{$TS_HOST}.key
+}
+
+netdata.homelab:80 {
+    reverse_proxy netdata:19999
+}
+
+adguard.homelab:80 {
+    reverse_proxy adguard:80
+}
+
+sparky.homelab:80 {
+    reverse_proxy sparkyfitness-frontend:80
+}
+
+{$TS_HOST}:8443 {
+    import ts
+    reverse_proxy sparkyfitness-frontend:80
+}
+
+{$TS_HOST}:8444 {
+    import ts
+    reverse_proxy vaultwarden:80
+}
+
+dash.homelab:80 {
+    reverse_proxy homepage:3000
+}
+
+wud.homelab:80 {
+    reverse_proxy wud:3000
+}
+
+{$TS_HOST}:8445 {
+    import ts
+    reverse_proxy dawarich_app:3000
+}
+
+{$TS_HOST}:8446 {
+    import ts
+    log
+
+    handle_path /api/* {
+        reverse_proxy your_spotify_server:8080
+    }
+
+    handle {
+        reverse_proxy your_spotify_client:3000
+    }
+}
+
+convert.homelab:80 {
+    request_body {
+        max_size 4GB
+    }
+    reverse_proxy convertx:3000
+}
+
+pdf.homelab:80 {
+    reverse_proxy stirling-pdf:8080
+}
+
+{$TS_HOST}:8447 {
+    import ts
+    reverse_proxy stirling-pdf:8080
+}
+
+romm.homelab:80 {
+	reverse_proxy romm:8080
+}
+
+{$TS_HOST}:8448 {
+	import ts
+	reverse_proxy romm:8080
+}
+
+excalidraw.homelab:80 {
+    reverse_proxy excalidraw:80
+}
+
+komodo.homelab:80 {
+    reverse_proxy komodo-core:9120
+}
+
+casa.homelab:80 {
+    reverse_proxy 172.17.0.1:8123
+}
+
+kitchen.homelab:80 {
+    reverse_proxy kitchenowl:8080
+}
+
+{$TS_HOST}:8449 {
+    import ts
+    reverse_proxy kitchenowl:8080
+}
+
+prreview.homelab:80 {
+    reverse_proxy prreview-web:80
+}
+
+{$TS_HOST}:8450 {
+	import ts
+	reverse_proxy couchdb:5984
+}
+
+insta-bot.homelab:80 {
+	# Credentials in caddy/.env (INSTA_BOT_PANEL_USER / INSTA_BOT_PANEL_HASH, hash from `caddy hash-password`)
+	basic_auth {
+		{$INSTA_BOT_PANEL_USER} {$INSTA_BOT_PANEL_HASH}
+	}
+	reverse_proxy 172.17.0.1:8091
+}

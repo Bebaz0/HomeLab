@@ -1,0 +1,18 @@
+[Unit]
+Description=Instagram LoL/Flex bot (one evening session)
+Requires=insta-bot-xvfb.service
+After=insta-bot-xvfb.service network-online.target
+
+[Service]
+Type=exec
+WorkingDirectory=%h/homelab/insta-bot
+Environment=DISPLAY=:99 TZ=Europe/Lisbon LANG=pt_PT.UTF-8 PYTHONUNBUFFERED=1
+EnvironmentFile=%h/homelab/insta-bot/.env
+# Panel on/off, start/end hours and data/STOPPED all live behind this check.
+ExecCondition=%h/homelab/insta-bot/.venv/bin/python bot.py --should-run
+ExecStart=%h/homelab/insta-bot/.venv/bin/python bot.py
+RuntimeMaxSec=24h
+Restart=no
+# SIGTERM only to python, which closes Chrome cleanly; the rest gets killed after 30s.
+KillMode=mixed
+TimeoutStopSec=30

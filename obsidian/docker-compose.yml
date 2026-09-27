@@ -1,0 +1,17 @@
+services:
+  couchdb:
+    image: couchdb:3.5.2.1
+    container_name: couchdb
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - ./data:/opt/couchdb/data
+      - ./etc:/opt/couchdb/etc/local.d
+    networks:
+      - homelab
+    labels:
+      - wud.tag.include=^\d+\.\d+\.\d+$$
+
+networks:
+  homelab:
+    external: true

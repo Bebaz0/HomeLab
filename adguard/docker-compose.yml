@@ -1,0 +1,20 @@
+services:
+  adguard:
+    image: adguard/adguardhome:latest
+    container_name: adguard
+    labels:
+      - wud.watch.digest=true
+    restart: unless-stopped
+    ports:
+      - "53:53/udp"
+      - "53:53/tcp"
+    volumes:
+      - ./work:/opt/adguardhome/work
+      - ./conf:/opt/adguardhome/conf
+    networks:
+      - homelab
+
+networks:
+  homelab:
+    external: true
+

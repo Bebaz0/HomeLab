@@ -1,0 +1,9 @@
+[Unit]
+Description=Tick insta-bot every ~5 min; bot.py --should-run decides (panel on/off + hours)
+
+[Timer]
+OnCalendar=*:0/5
+RandomizedDelaySec=4min
+
+[Install]
+WantedBy=timers.target

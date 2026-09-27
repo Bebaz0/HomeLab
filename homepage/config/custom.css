@@ -1,0 +1,396 @@
+/* arroz dashboard: arch-flavoured, solid panels, mono labels, no gradients/glow */
+
+:root {
+  --arroz-accent: #1793d1;
+  --arroz-panel: rgba(13, 17, 23, 0.82);
+  --arroz-panel-hover: rgba(20, 27, 36, 0.9);
+  --arroz-line: rgba(255, 255, 255, 0.09);
+  --arroz-line-strong: rgba(255, 255, 255, 0.16);
+  --arroz-text-dim: rgba(226, 232, 240, 0.62);
+  --arroz-mono: ui-monospace, "JetBrains Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+  --arroz-radius: 8px;
+  --arroz-radius-sm: 5px;
+}
+
+/* ---------- layout ---------- */
+
+#page_container,
+#inner_wrapper > div {
+  max-width: 1240px;
+}
+
+#information-widgets {
+  margin-bottom: 0.5rem;
+}
+
+/* consistent air between groups now that there are five of them */
+.services-group {
+  margin-bottom: 0.35rem;
+}
+
+/* ---------- panels: widgets + service cards share one surface ---------- */
+
+.widget-container,
+.information-widget-search,
+.service-card,
+#footer .widget-container {
+  background: var(--arroz-panel) !important;
+  border: 1px solid var(--arroz-line);
+  border-radius: var(--arroz-radius) !important;
+  box-shadow: none !important;
+  backdrop-filter: blur(6px);
+  transition: border-color 140ms ease, background-color 140ms ease, transform 140ms ease;
+}
+
+.service-card:hover {
+  background: var(--arroz-panel-hover) !important;
+  border-color: var(--arroz-accent);
+  transform: translateY(-1px);
+}
+
+/* accent rail on the left edge of every service */
+.service-card::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  border-radius: var(--arroz-radius) 0 0 var(--arroz-radius);
+  background: var(--arroz-accent);
+  opacity: 0;
+  transition: opacity 140ms ease;
+}
+
+.service-card:hover::before,
+.service-card:focus-within::before {
+  opacity: 1;
+}
+
+/* keyboard focus has to be visible without a glow */
+.service-card:focus-within {
+  border-color: var(--arroz-accent);
+}
+
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--arroz-accent);
+  outline-offset: 2px;
+  border-radius: var(--arroz-radius-sm);
+}
+
+/* ---------- group headers ---------- */
+
+.services-group > h2,
+.service-group-name {
+  font-family: var(--arroz-mono);
+  font-size: 0.78rem !important;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(241, 245, 249, 0.92);
+}
+
+.service-group-icon svg,
+.service-group-icon img {
+  color: var(--arroz-accent);
+  width: 1.05rem;
+  height: 1.05rem;
+}
+
+/* thin rule under the group header, full column width */
+.services-group > button {
+  border-bottom: 1px solid var(--arroz-line);
+  padding-bottom: 0.4rem;
+}
+
+/* ---------- inline widget stats (adguard, romm, wud, netdata) ---------- */
+
+.service-block {
+  background: rgba(255, 255, 255, 0.035) !important;
+  border: 1px solid transparent;
+  border-radius: var(--arroz-radius-sm) !important;
+  padding: 0.3rem 0.35rem !important;
+  text-align: center;
+  min-width: 0;
+}
+
+.service-card:hover .service-block {
+  border-color: var(--arroz-line);
+}
+
+/* value */
+.service-block > div:first-child {
+  font-family: var(--arroz-mono);
+  font-size: 0.95rem !important;
+  font-weight: 500 !important;
+  font-variant-numeric: tabular-nums;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* label */
+.service-block > div:last-child {
+  font-family: var(--arroz-mono);
+  font-size: 0.58rem !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.1em;
+  color: var(--arroz-text-dim);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* four blocks in one card get cramped on a narrow card: let them wrap in pairs
+   instead of being clipped. .service-stats caps its own height at 110px, so the
+   expanded state needs room for the second row (the collapsed class is untouched) */
+.service-container {
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.service-container > .service-block {
+  flex: 1 1 auto;
+  min-width: 70px;
+  margin: 0 !important;
+}
+
+.service-stats.max-h-\[110px\] {
+  max-height: 240px !important;
+}
+
+/* ---------- widget error state ----------
+   an unconfigured widget (missing key in .env) should read as a quiet note,
+   not a red slab across the card */
+
+.service-card details > summary {
+  background: rgba(255, 255, 255, 0.035) !important;
+  border: 1px solid var(--arroz-line);
+  border-radius: var(--arroz-radius-sm) !important;
+  padding: 0.35rem 0.5rem !important;
+  margin-top: 0.35rem !important;
+  color: var(--arroz-text-dim) !important;
+  font-family: var(--arroz-mono);
+}
+
+.service-card details > summary:hover {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border-color: var(--arroz-line-strong);
+}
+
+.service-card details > summary > div {
+  font-size: 0.6rem !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.service-card details > summary svg {
+  color: #d18b47;
+  width: 0.85rem !important;
+  height: 0.85rem !important;
+}
+
+/* ---------- service card contents ---------- */
+
+.service-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.service-description {
+  font-size: 0.74rem;
+  color: var(--arroz-text-dim) !important;
+}
+
+.service-icon img,
+.service-icon svg {
+  transition: transform 140ms ease;
+}
+
+.service-card:hover .service-icon img,
+.service-card:hover .service-icon svg {
+  transform: scale(1.06);
+}
+
+/* ---------- status tags ---------- */
+
+.service-tags .service-tag > div,
+.site-monitor-status,
+.docker-status {
+  font-family: var(--arroz-mono);
+  font-size: 0.62rem !important;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid var(--arroz-line);
+  border-radius: 3px !important;
+  white-space: nowrap;
+}
+
+/* ---------- resource + datetime widgets ---------- */
+
+.information-widget-resource div {
+  font-family: var(--arroz-mono);
+  font-size: 0.72rem;
+}
+
+/* mono is wider than the default face: keep the metrics packed per row */
+.information-widget-resource > div {
+  min-width: 74px !important;
+}
+
+.information-widget-resource .resource-icon {
+  color: var(--arroz-accent);
+}
+
+.information-widget-resource .resource-usage > div {
+  border-radius: 1px !important;
+  background: var(--arroz-accent) !important;
+}
+
+.information-widget-datetime span {
+  font-family: var(--arroz-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+
+/* ---------- search + quicklaunch ---------- */
+
+.information-widget-search input {
+  font-family: var(--arroz-mono);
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid var(--arroz-line) !important;
+  border-radius: var(--arroz-radius) !important;
+}
+
+.information-widget-search input:focus {
+  border-color: var(--arroz-accent) !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+#quicklaunch-container input {
+  font-family: var(--arroz-mono);
+  border-radius: var(--arroz-radius) !important;
+}
+
+/* ---------- footer ---------- */
+
+#footer {
+  font-family: var(--arroz-mono);
+  font-size: 0.68rem;
+  opacity: 0.5;
+}
+
+/* ---------- tablet ---------- */
+
+@media (min-width: 641px) and (max-width: 1023px) {
+  #inner_wrapper > div {
+    padding-left: 1.1rem !important;
+    padding-right: 1.1rem !important;
+  }
+
+  .service-block > div:first-child {
+    font-size: 0.88rem !important;
+  }
+
+  .service-container > .service-block {
+    flex: 0 0 calc(50% - 0.15rem);
+    max-width: calc(50% - 0.15rem);
+  }
+}
+
+/* ---------- mobile ---------- */
+
+@media (max-width: 640px) {
+  #inner_wrapper > div {
+    padding: 0.9rem 0.75rem 2rem !important;
+  }
+
+  /* the header stack eats the fold on a phone, so tighten it */
+  .widget-container,
+  .information-widget-search {
+    padding: 0.5rem 0.7rem !important;
+    margin-top: 0.4rem !important;
+  }
+
+  /* stack the header widgets instead of squeezing them side by side */
+  #widgets-wrap,
+  #information-widgets-right {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  #widgets-wrap > div,
+  #information-widgets-right > div {
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  /* two metrics per row reads better than one long column.
+     the stock mr-3 pushes the second item off the row, so drop it */
+  .information-widget-resource {
+    flex: 0 0 50%;
+    max-width: 50%;
+    margin-right: 0 !important;
+  }
+
+  .service-card {
+    /* comfortable tap target */
+    min-height: 56px;
+  }
+
+  .service-name {
+    font-size: 0.95rem;
+  }
+
+  .service-description {
+    font-size: 0.78rem;
+  }
+
+  /* widget stats: two per row instead of four squeezed ones */
+  .service-container > .service-block {
+    flex: 0 0 calc(50% - 0.15rem);
+    max-width: calc(50% - 0.15rem);
+  }
+
+  .service-block > div:first-child {
+    font-size: 0.9rem !important;
+  }
+
+  /* mono is wide: this keeps the clock on one line at 360px */
+  .information-widget-datetime span {
+    font-size: 1.05rem !important;
+  }
+
+  /* alone in a full-width panel, the clock should sit centred */
+  .information-widget-datetime {
+    align-items: center;
+  }
+
+  .services-group > h2,
+  .service-group-name {
+    font-size: 0.72rem !important;
+  }
+
+  /* status row can overflow a narrow card, let it wrap */
+  .service-tags {
+    flex-wrap: wrap;
+    gap: 0.25rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .service-card,
+  .service-card::before,
+  .service-icon img,
+  .service-icon svg {
+    transition: none;
+  }
+
+  .service-card:hover {
+    transform: none;
+  }
+}
