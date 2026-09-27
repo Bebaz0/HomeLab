@@ -22,29 +22,6 @@ Every service is a small Docker Compose stack in its own folder. They all share 
 
 ## Architecture
 
-```mermaid
-flowchart LR
-    lan["Devices at home"]
-    remote["Devices anywhere<br/>via Tailscale"]
-
-    lan -->|DNS| adguard["AdGuard Home<br/>resolves *.homelab"]
-    lan -->|"http://name.homelab"| caddy
-    remote -->|"https://tailnet-host:84xx"| caddy
-
-    caddy(["Caddy reverse proxy"])
-
-    subgraph net["docker network: homelab"]
-        direction TB
-        apps["Vaultwarden, KitchenOwl, Dawarich<br/>SparkyFitness, Your Spotify, RomM<br/>ConvertX, Stirling PDF, Excalidraw<br/>Obsidian LiveSync, PR Review"]
-        ops["Homepage, Komodo, WUD, Netdata"]
-    end
-
-    caddy --> apps
-    caddy --> ops
-    caddy -.->|host network| ha["Home Assistant"]
-    caddy -.->|basic auth| bot["insta-bot panel<br/>systemd service"]
-```
-
 - **Two ways in, one proxy.** Plain-HTTP `*.homelab` names for the LAN, resolved by AdGuard. Services that need HTTPS (Vaultwarden, the PWAs, OAuth callbacks) get their own port on the Tailscale hostname, using a real cert from `tailscale cert`.
 - **Databases stay private.** Postgres, MariaDB, Mongo and Redis only live on per-stack internal networks. Only the frontends join `homelab`.
 - **Ops:** [Homepage](homepage/) is the dashboard, [Komodo](komodo/) manages the stacks, [WUD](wud/) checks for image updates every morning, and [Netdata](netdata/) watches the host.
