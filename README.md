@@ -44,6 +44,7 @@ Every service is a small Docker Compose stack in its own folder. They all share 
 | **Productivity** | [ConvertX](https://github.com/C4illin/ConvertX) | Convert any file to any format |
 | | [Stirling PDF](https://www.stirlingpdf.com) | Every PDF tool you'd ever need |
 | | [Excalidraw](https://excalidraw.com) | Whiteboard and diagrams |
+| | [Paperless-ngx](https://docs.paperless-ngx.com) | Scans, OCRs and indexes every paper document |
 | | [Obsidian LiveSync](https://github.com/vrtmrz/obsidian-livesync) | CouchDB backend syncing my Obsidian vault across devices |
 | | **[PR Review](prreview/)** ⭐ | *Custom:* static-analysis bot for my GitHub PRs |
 | **Fun** | [Your Spotify](https://github.com/Yooooomi/your_spotify) | Spotify Wrapped, but all year round |

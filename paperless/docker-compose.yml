@@ -1,0 +1,48 @@
+services:
+  broker:
+    image: docker.io/valkey/valkey:9-alpine   # fixa no minor atual
+    container_name: paperless-broker
+    restart: unless-stopped
+    volumes:
+      - ./data/redis:/data
+    networks: [internal]
+
+  db:
+    image: docker.io/library/postgres:18      # fixa no minor atual
+    container_name: paperless-db
+    restart: unless-stopped
+    volumes:
+      - ./data/pgdata:/var/lib/postgresql
+    environment:
+      POSTGRES_DB: paperless
+      POSTGRES_USER: paperless
+    env_file: .env
+    networks: [internal]
+
+  webserver:
+    image: ghcr.io/paperless-ngx/paperless-ngx:3.3.4
+    container_name: paperless
+    restart: unless-stopped
+    depends_on: [db, broker]
+    volumes:
+      - ./data/data:/usr/src/paperless/data
+      - ./data/media:/usr/src/paperless/media
+      - ./export:/usr/src/paperless/export
+      - ./consume:/usr/src/paperless/consume
+    environment:
+      PAPERLESS_REDIS: redis://broker:6379
+      PAPERLESS_DBHOST: db
+      PAPERLESS_DBENGINE: postgresql
+      PAPERLESS_URL: http://paperless.homelab
+      PAPERLESS_TIME_ZONE: Europe/Lisbon
+      PAPERLESS_OCR_LANGUAGES: por        # instala o pacote de PT no arranque
+      PAPERLESS_OCR_LANGUAGE: por+eng
+      USERMAP_UID: 1000                   # confirma com `id -u`
+      USERMAP_GID: 1000
+    env_file: .env
+    networks: [internal, homelab]
+
+networks:
+  internal:
+  homelab:
+    external: true

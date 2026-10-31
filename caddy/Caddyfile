@@ -121,3 +121,10 @@ insta-bot.homelab:80 {
 	}
 	reverse_proxy 172.17.0.1:8091
 }
+
+paperless.homelab:80 {
+    request_body {
+        max_size 200MB
+    }
+    reverse_proxy paperless:8000
+}
