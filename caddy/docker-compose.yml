@@ -6,6 +6,7 @@ services:
       - wud.watch.digest=true
     restart: unless-stopped
     env_file: .env
+    command: caddy run --config /etc/caddy/conf/Caddyfile --adapter caddyfile
     ports:
       - "80:80"
       - "8443:8443"
@@ -17,7 +18,8 @@ services:
       - "8449:8449"
       - "8450:8450"
     volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      # whole dir, not the file: a file bind mount pins the inode and goes stale when an editor saves
+      - .:/etc/caddy/conf:ro
       - caddydata:/data
       - caddyconfig:/config
       - /etc/caddy/certs:/etc/caddy/certs:ro

@@ -18,7 +18,7 @@ services:
     restart: unless-stopped
     volumes:
       - ./data/out:/srv:ro
-      - ./web/Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./web:/etc/caddy:ro   # dir, not file: file mounts go stale on editor saves
     networks:
       - homelab
     labels:
