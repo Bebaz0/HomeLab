@@ -136,6 +136,19 @@
         server: local
         container: couchdb
 
+    - Paperless:
+        icon: paperless-ngx.svg
+        href: http://paperless.homelab
+        description: Arquivo de documentos com OCR
+        siteMonitor: http://paperless:8000
+        server: local
+        container: paperless
+        # widget: precisa de um token API (Paperless > Perfil), depois:
+        # widget:
+        #   type: paperlessngx
+        #   url: http://paperless:8000
+        #   key: "{{HOMEPAGE_VAR_PAPERLESS_KEY}}"
+
 - Serviços:
     - Vaultwarden:
         icon: vaultwarden.svg

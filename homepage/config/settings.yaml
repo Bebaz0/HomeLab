@@ -28,25 +28,15 @@ quicklaunch:
   hideInternetSearch: false
   provider: duckduckgo
 
-# a ordem aqui é a ordem no ecrã. Grupo novo = bloco novo aqui + em services.yaml
+# a ordem aqui é a ordem no ecrã (cada grupo é uma coluna, ver custom.css). Grupo novo = bloco novo aqui + em services.yaml
 layout:
   Infraestrutura:
-    style: row
-    columns: 2
     icon: mdi-server-network
   Família:
-    style: row
-    columns: 3
     icon: mdi-home-heart
   Produtividade:
-    style: row
-    columns: 3
     icon: mdi-briefcase-outline
   Serviços:
-    style: row
-    columns: 2
     icon: mdi-apps
   Entretenimento:
-    style: row
-    columns: 2
     icon: mdi-gamepad-variant-outline
